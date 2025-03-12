@@ -1,0 +1,579 @@
+body {
+  width: 450px;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  margin: 0;
+  padding: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+#container {
+  column-count: 3;
+  column-gap: 12px;
+  padding: 12px;
+}
+.image-item {
+  break-inside: avoid;
+  margin-bottom: 15px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #242424;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.image-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.image-item:hover img {
+  transform: scale(1.05);
+}
+.actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.image-item:hover .actions {
+  opacity: 1;
+}
+.action-btn {
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+.action-btn:hover {
+  background: #3a3a3a;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+.action-btn i {
+  font-size: 18px;
+}
+.image-item.dragging {
+  opacity: 0.5;
+  cursor: move;
+  position: relative;
+  z-index: 1000;
+  transition: transform 0s;
+}
+.image-item.dragging img {
+  transform: scale(1);
+}
+.image-item.drag-over {
+  border: 2px dashed #ffffff;
+}
+.empty-state {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  border-color: #ffffff;
+  border-radius: 12px;
+  /* background: #242424; */
+}
+#headerSelectBtn {
+  border: 1px solid #666;
+}
+/* #headerSelectBtn:hover{
+  background: none;
+  border: 1px solid #666;
+} */
+.download-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 8px;
+  display: none;
+  backdrop-filter: blur(4px);
+}
+.download-progress.active {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #4CAF50;
+  width: 0%;
+  transition: width 0.2s;
+}
+.download-status {
+  font-size: 12px;
+  color: #fff;
+}
+.toolbar {
+  padding: 10px 15px;
+  background: rgba(26, 26, 26, 0.95);
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.toolbar.active {
+  display: flex;
+  transform: translateY(0);
+  opacity: 1;
+}
+.select-mode .image-item {
+  position: relative;
+}
+.select-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #fff;
+  cursor: pointer;
+  display: none;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+.select-checkbox i {
+  display: none; /* إخفاء الأيقونة بشكل افتراضي */
+  color: #fff;
+  font-size: 16px;
+}
+.select-checkbox.checked i {
+  display: block; /* إظهار الأيقونة فقط عند التحديد */
+}
+.select-mode .select-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.select-checkbox.checked {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+.select-checkbox.checked::after {
+  content: '✓';
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.toolbar-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.toolbar-btn.delete {
+  background: rgba(244, 67, 54, 0.2);
+  color: #ff5252;
+}
+.toolbar-btn.delete:hover {
+  background: rgba(244, 67, 54, 0.3);
+}
+.toolbar-btn.cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa;
+}
+.toolbar-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.toolbar-btn i {
+  font-size: 16px;
+}
+.toolbar-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  z-index: 100;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.select-mode .regular-actions {
+  display: none;
+}
+.select-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #fff;
+  cursor: pointer;
+  display: none;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+.select-checkbox i {
+  display: none; /* إخفاء الأيقونة بشكل افتراضي */
+  color: #fff;
+  font-size: 16px;
+}
+.select-checkbox.checked i {
+  display: block; /* إظهار الأيقونة فقط عند التحديد */
+}
+.select-mode .select-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.select-checkbox::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+.select-checkbox.checked::before {
+  background: #4CAF50;
+}
+.select-checkbox:hover {
+  transform: scale(1.1);
+  border-color: #4CAF50;
+}
+.toolbar {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.95);
+}
+.toolbar-btn {
+  padding: 8px 16px;
+  font-weight: 500;
+}
+.header-btn-t {
+  background: transparent;
+  border: 1px solid #666;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+.header-btn{
+  background: transparent;
+  border:none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+.header-btn-t:hover {
+  background: #333;
+  border-color: #888;
+}
+.header-btn-t i {
+  font-size: 18px;
+}
+.select-mode .image-item img {
+  transform: none !important;
+}
+
+.loading-container {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #333;
+  border-top: 5px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.folder-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-folder {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.folder-item {
+  background: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.folder-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.folder-content {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.folder-icon {
+  width: 40px;
+  height: 40px;
+  background: #333;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-icon i {
+  font-size: 24px;
+  color: #4CAF50;
+}
+
+.folder-info {
+  flex: 1;
+}
+
+.folder-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.folder-count {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.new-folder-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #242424;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  width: 300px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.context-menu {
+  position: absolute;
+  background: #242424;
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 180px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.menu-item {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.menu-item:hover {
+  background: #333;
+}
+
+.menu-item i {
+  font-size: 16px;
+  color: #aaa;
+}
+
+.menu-separator {
+  height: 1px;
+  background: #333;
+  margin: 4px 0;
+}
+
+.menu-header {
+  padding: 8px 16px;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.saving-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.saving-dialog {
+    background: #242424;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.preview-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.folder-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 15px 0;
+}
+
+.folder-list-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+.folder-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.dialog-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #4CAF50;
+    color: #fff;
+}
+
+.dialog-btn.cancel {
+    background: #333;
+}
+
+.dialog-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}

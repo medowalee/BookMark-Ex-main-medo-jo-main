@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="settings-container">
+        <h2>الإعدادات</h2>
+        
+        <div class="setting-item">
+            <div class="setting-title">حفظ تلقائي للصور</div>
+            <div class="setting-description">حفظ الصور تلقائياً عند النسخ</div>
+            <div class="setting-control">
+                <label class="switch">
+                    <input type="checkbox" id="autoSave">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="shortcut-container">
+                <div class="shortcut-label">اختصار لوحة المفاتيح:</div>
+                <div class="shortcut-input" id="shortcutInput" tabindex="0">
+                    <span id="shortcutText">انقر لتعيين الاختصار</span>
+                    <i class="ri-edit-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-title">تنسيق التحميل الافتراضي</div>
+            <div class="setting-description">اختر تنسيق الصور عند التحميل</div>
+            <div class="setting-control">
+                <select id="defaultFormat">
+                    <option value="original">احتفظ بالصيغة الأصلية</option>
+                    <option value="png">تحويل إلى PNG</option>
+                    <option value="jpg">تحويل إلى JPG</option>
+                    <option value="auto">تحويل تلقائي حسب نوع الصورة</option>
+                </select>
+            </div>
+            <div class="format-options">
+                <label class="format-option">
+                    <input type="checkbox" id="keepOriginalGif"> 
+                    احتفظ بصيغة GIF كما هي
+                </label>
+                <label class="format-option">
+                    <input type="checkbox" id="compressImages"> 
+                    ضغط الصور للحجم الأمثل
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-title">الإشعارات</div>
+            <div class="setting-description">تفعيل/تعطيل إشعارات الإضافة</div>
+            <div class="setting-control">
+                <label class="switch">
+                    <input type="checkbox" id="notifications">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div id="notification-options" style="display: none; margin-top: 15px;">
+                <div class="setting-description">اختر نوع الإشعارات:</div>
+                <div class="notification-types">
+                    <label class="notification-option">
+                        <input type="radio" name="notificationType" value="browser" id="browserNotification">
+                        <span class="notification-label">
+                            <i class="ri-chrome-line"></i>
+                            إشعارات المتصفح
+                        </span>
+                    </label>
+                    <label class="notification-option">
+                        <input type="radio" name="notificationType" value="system" id="systemNotification">
+                        <span class="notification-label">
+                            <i class="ri-computer-line"></i>
+                            إشعارات النظام
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <!-- <div class="setting-title">إعدادات تنسيق التحميل</div>
+            <div class="setting-description">تحديد صيغة تحميل الصور</div>
+            <div class="setting-control">
+                <label class="switch">
+                    <input type="checkbox" id="useCustomFormat">
+                    <span class="slider"></span>
+                </label>
+            </div> -->
+            <div id="format-options" style="display: none; margin-top: 15px;">
+                <div class="format-rules">
+                    <div class="format-rule">
+                        <select id="defaultFormat" class="format-select">
+                            <option value="original">احتفظ بالصيغة الأصلية</option>
+                            <option value="png">تحويل إلى PNG</option>
+                            <option value="jpg">تحويل إلى JPG</option>
+                        </select>
+                        <div class="format-exception">
+                            <label>
+                                <input type="checkbox" id="keepGif"> 
+                                احتفظ بصيغة GIF كما هي
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="settings.js"></script>
+</body>
+</html>

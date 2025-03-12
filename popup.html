@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <title>Image Bookmarks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="folder-nav">
+        <button id="backBtn" class="header-btn" disabled>
+          <i class="ri-arrow-left-line"></i>
+        </button>
+        <div class="current-folder">الرئيسية</div>
+      </div>
+      <div class="header-actions">
+        <button id="newFolderBtn" class="header-btn-t">
+          <i class="ri-folder-add-line"></i>
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button id="settingsBtn" class="header-btn-t">
+            <i class="ri-settings-3-line"></i>
+          </button>
+          <button id="headerSelectBtn" class="header-btn-t" style="display: none;">
+            تحديد
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="toolbar" class="toolbar">
+      <div class="toolbar-group">
+        <button id="selectAllBtn" class="toolbar-btn">
+          <i class="ri-checkbox-multiple-line"></i> تحديد الكل
+        </button>
+      </div>
+      <div class="toolbar-group">
+        <button id="downloadSelectedBtn" class="toolbar-btn">
+          <i class="ri-download-2-line"></i> تحميل المحدد
+        </button>
+        <button id="deleteSelectedBtn" class="toolbar-btn delete">
+          <i class="ri-delete-bin-line"></i> حذف المحدد
+        </button>
+        <button id="cancelSelectBtn" class="toolbar-btn cancel">
+          <i class="ri-close-line"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="container"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
