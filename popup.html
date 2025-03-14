@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <title>Image Bookmarks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <script src="js/browser-detector.js"></script>
+  <style>
+    body {
+      background-color: #1a1f2c;
+      color: #ffffff;
+      margin: 0;
+      padding: 10px;
+      font-family: 'Poppins', sans-serif;
+    }
+    #container {
+      column-count: 3;
+      column-gap: 12px;
+      padding: 12px;
+    }
+    .image-item {
+      break-inside: avoid;
+      margin-bottom: 15px;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #242d3d;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.3s ease-out;
+    }
+    .image-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .image-item:hover img {
+      transform: scale(1.05);
+    }
+    .actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .image-item:hover .actions {
+      opacity: 1;
+    }
+    .action-btn {
+      background: rgba(25, 33, 52, 0.8);
+      color: #ffffff;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .action-btn:hover {
+      background: #2d3748;
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+    .action-btn i {
+      font-size: 18px;
+    }
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+    .image-item.dragging {
+      opacity: 0.5;
+      cursor: move;
+      position: relative;
+      z-index: 1000;
+      transition: transform 0s;
+    }
+    .image-item.dragging img {
+      transform: scale(1);
+    }
+    .image-item.drag-over {
+      border: 2px dashed #ffffff;
+    }
+    .image-item.removing {
+      animation: disintegrate 0.5s ease-out forwards;
+      perspective: 1000px;
+    }
+    .empty-state {
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      border-color: #ffffff;
+      border-radius: 12px;
+    }
+    #headerSelectBtn {
+      border: 1px solid #4a5568;
+    }
+    .download-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 8px;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .download-progress.active {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideIn 0.3s ease-out;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .download-status {
+      font-size: 12px;
+      color: #fff;
+    }
+    .toolbar {
+      padding: 10px 15px;
+      background: rgba(26, 32, 44, 0.95);
+      border-radius: 8px;
+      margin-top: 5px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(99, 179, 237, 0.1);
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toolbar.active {
+      display: flex;
+      transform: translateY(0);
+      opacity: 1;
+      animation: slideIn 0.3s ease forwards;
+    }
+    .select-mode .image-item {
+      position: relative;
+    }
+    .select-checkbox {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(26, 32, 44, 0.7);
+      border: 2px solid #fff;
+      cursor: pointer;
+      display: none;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      animation: scaleIn 0.2s ease-out;
+    }
+    .select-checkbox i {
+      display: none;
+      color: #fff;
+      font-size: 16px;
+    }
+    .select-checkbox.checked i {
+      display: block;
+    }
+    .select-mode .select-checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .select-checkbox.checked {
+      background: #4299e1;
+      border-color: #4299e1;
+      animation: scaleIn 0.2s ease-out;
+    }
+    .select-checkbox.checked::after {
+      content: '✓';
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .toolbar-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      background: rgba(44, 82, 130, 0.2);
+      color: #fff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .toolbar-btn:hover {
+      background: rgba(44, 82, 130, 0.4);
+      transform: translateY(-1px);
+    }
+    .toolbar-btn.delete {
+      background: rgba(229, 62, 62, 0.1);
+      color: #fc8181;
+    }
+    .toolbar-btn.delete:hover {
+      background: rgba(229, 62, 62, 0.2);
+    }
+    .toolbar-btn.cancel {
+      background: rgba(255, 255, 255, 0.05);
+      color: #aaa;
+    }
+    .toolbar-btn.cancel:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .toolbar-btn i {
+      font-size: 16px;
+    }
+    .toolbar-btn:active {
+      transform: scale(0.95);
+    }
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      background: #1a1f2c;
+      padding: 10px;
+      border-bottom: 1px solid #2d3748;
+      z-index: 100;
+    }
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .select-mode .regular-actions {
+      display: none;
+    }
+    .select-checkbox {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(26, 32, 44, 0.7);
+      border: 2px solid #fff;
+      cursor: pointer;
+      display: none;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      animation: scaleIn 0.2s ease-out;
+    }
+    .select-checkbox i {
+      display: none;
+      color: #fff;
+      font-size: 16px;
+    }
+    .select-checkbox.checked i {
+      display: block;
+    }
+    .select-mode .select-checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .select-checkbox::before {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: transparent;
+      transition: all 0.2s ease;
+    }
+    .select-checkbox.checked::before {
+      background: #4CAF50;
+    }
+    .select-checkbox:hover {
+      transform: scale(1.1);
+      border-color: #4299e1;
+    }
+    .toolbar {
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.95);
+    }
+    .toolbar-btn {
+      padding: 8px 16px;
+      font-weight: 500;
+    }
+    .header-btn-t {
+      background: transparent;
+      border: 1px solid #666;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+    .header-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+    .header-btn-t:hover {
+      background: #2d3748;
+      border-color: #4299e1;
+    }
+    .header-btn-t i {
+      font-size: 18px;
+    }
+    .select-mode .image-item img {
+      transform: none !important;
+    }
+    .select-mode .header-content {
+      display: none;
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+
+    /* إضافة keyframes للتحريكات */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes disintegrate {
+      0% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+        filter: blur(0);
+      }
+      50% {
+        transform: scale(0.8) rotate(5deg);
+        opacity: 0.5;
+        filter: blur(2px);
+      }
+      100% {
+        transform: scale(0) rotate(15deg);
+        opacity: 0;
+        filter: blur(4px);
+      }
+    }
+
+    /* تعديل الحاوية لتحسين تأثير التفتت */
+    .container {
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h2>الصور المحفوظة</h2>
+      <button id="headerSelectBtn" class="header-btn-t">
+        تحديد
+      </button>
+    </div>
+    <div id="toolbar" class="toolbar">
+      <div class="toolbar-group">
+        <button id="selectAllBtn" class="toolbar-btn">
+          <i class="ri-checkbox-multiple-line"></i> تحديد الكل
+        </button>
+      </div>
+      <div class="toolbar-group">
+        <button id="downloadSelectedBtn" class="toolbar-btn">
+          <i class="ri-download-2-line"></i> تحميل المحدد
+        </button>
+        <button id="deleteSelectedBtn" class="toolbar-btn delete">
+          <i class="ri-delete-bin-line"></i> حذف المحدد
+        </button>
+        <button id="cancelSelectBtn" class="toolbar-btn cancel">
+          <i class="ri-close-line"></i> إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="container"></div>
+  <script src="js/loading.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
