@@ -402,7 +402,7 @@ function deleteImage(id) {
   });
 }
 
-function toggleFullscreen(url, imgId) {
+async function toggleFullscreen(url, imgId) {
   try {
     const fullscreenContainer = document.createElement('div');
     fullscreenContainer.className = 'fullscreen-container discord-style';
@@ -473,41 +473,65 @@ function toggleFullscreen(url, imgId) {
     });
     
     shareButton.addEventListener('click', async () => {
-      // إنشاء قائمة المشاركة
       const shareMenu = document.createElement('div');
       shareMenu.className = 'share-menu';
       
-      // إضافة خيارات المشاركة
-      const shareOptions = shareManager.generateShareLinks(url);
-      const platforms = {
-          copy: { icon: 'ri-file-copy-line', text: 'نسخ الرابط' },
-          twitter: { icon: 'ri-twitter-fill', text: 'Twitter' },
-          facebook: { icon: 'ri-facebook-fill', text: 'Facebook' },
-          whatsapp: { icon: 'ri-whatsapp-fill', text: 'WhatsApp' },
-          telegram: { icon: 'ri-telegram-fill', text: 'Telegram' }
-      };
-  
-      for (const [platform, option] of Object.entries(platforms)) {
-          const button = document.createElement('button');
-          button.className = 'share-option';
-          button.innerHTML = `
-              <i class="${option.icon}"></i>
-              <span>${option.text}</span>
-          `;
-  
-          button.addEventListener('click', async () => {
-              if (platform === 'copy') {
-                  await navigator.clipboard.writeText(url);
-                  showNotification('نجاح', 'تم نسخ الرابط');
-              } else {
-                  window.open(shareOptions[platform], '_blank');
-              }
-              shareMenu.remove();
-          });
-  
-          shareMenu.appendChild(button);
+      // Convert base64 to blob URL if needed
+      let shareUrl = url;
+      if (url.startsWith('data:')) {
+        try {
+          const response = await fetch(url);
+          const blob = await response.blob();
+          shareUrl = URL.createObjectURL(blob);
+        } catch (error) {
+          console.error('Error converting base64 to blob:', error);
+          showNotification('خطأ', 'لا يمكن مشاركة هذه الصورة');
+          return;
+        }
       }
-  
+      
+      const shareOptions = {
+        copy: shareUrl,
+        twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+        whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`,
+        telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}`
+      };
+
+      const platforms = {
+        copy: { icon: 'ri-file-copy-line', text: 'نسخ الرابط' },
+        twitter: { icon: 'ri-twitter-fill', text: 'Twitter' },
+        facebook: { icon: 'ri-facebook-fill', text: 'Facebook' },
+        whatsapp: { icon: 'ri-whatsapp-fill', text: 'WhatsApp' },
+        telegram: { icon: 'ri-telegram-fill', text: 'Telegram' }
+      };
+
+      for (const [platform, option] of Object.entries(platforms)) {
+        const button = document.createElement('button');
+        button.className = 'share-option';
+        button.innerHTML = `
+          <i class="${option.icon}"></i>
+          <span>${option.text}</span>
+        `;
+
+        button.addEventListener('click', async () => {
+          if (platform === 'copy') {
+            await navigator.clipboard.writeText(shareOptions[platform]);
+            showNotification('نجاح', 'تم نسخ الرابط');
+          } else {
+            window.open(shareOptions[platform], '_blank');
+          }
+          shareMenu.remove();
+
+          // Clean up blob URL
+          if (shareUrl !== url) {
+            URL.revokeObjectURL(shareUrl);
+          }
+        });
+
+        shareMenu.appendChild(button);
+      }
+
       // إضافة القائمة إلى الصفحة
       shareMenu.style.top = `${shareButton.offsetTop + shareButton.offsetHeight}px`;
       shareMenu.style.left = `${shareButton.offsetLeft}px`;
@@ -521,7 +545,7 @@ function toggleFullscreen(url, imgId) {
           }
       };
       setTimeout(() => document.addEventListener('click', closeMenu), 0);
-  });
+    });
     
     document.addEventListener('keydown', function handleEsc(e) {
       if (e.key === 'Escape') {

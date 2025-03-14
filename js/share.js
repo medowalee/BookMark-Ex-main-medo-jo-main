@@ -1,7 +1,7 @@
 class ShareManager {
     constructor() {
         this.shareEndpoint = 'https://api.imgur.com/3/image';
-        this.clientId = '8335f9895af22db    '; // احصل على Client ID من Imgur
+        this.clientId = '8335f9895af22db'; // احصل على Client ID من Imgur
     }
 
     async shareImage(imageUrl) {
