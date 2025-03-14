@@ -11,27 +11,38 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 document.addEventListener('DOMContentLoaded', () => {
   loadImages();
 
-  document.getElementById('headerSelectBtn').addEventListener('click', toggleSelectMode);
-  document.getElementById('selectAllBtn').addEventListener('click', () => {
-    const checkboxes = document.querySelectorAll('.select-checkbox');
-    const allChecked = Array.from(checkboxes).every(cb => cb.classList.contains('checked'));
+  // التحقق من وجود الأزرار قبل إضافة مستمعات الأحداث
+  const headerSelectBtn = document.getElementById('headerSelectBtn');
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  const downloadSelectedBtn = document.getElementById('downloadSelectedBtn');
+  const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+  const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-    checkboxes.forEach(checkbox => {
-      checkbox.classList.toggle('checked', !allChecked);
-      const imgId = parseInt(checkbox.closest('.image-item').dataset.id);
-      if (!allChecked) {
-        selectedImages.add(imgId);
-      } else {
-        selectedImages.delete(imgId);
-      }
+  if (headerSelectBtn) headerSelectBtn.addEventListener('click', toggleSelectMode);
+  if (selectAllBtn) {
+    selectAllBtn.addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('.select-checkbox');
+      const allChecked = Array.from(checkboxes).every(cb => cb.classList.contains('checked'));
+
+      checkboxes.forEach(checkbox => {
+        checkbox.classList.toggle('checked', !allChecked);
+        const imgId = parseInt(checkbox.closest('.image-item').dataset.id);
+        if (!allChecked) {
+          selectedImages.add(imgId);
+        } else {
+          selectedImages.delete(imgId);
+        }
+      });
+
+      updateToolbar();
     });
+  }
 
-    updateToolbar();
-  });
-
-  document.getElementById('downloadSelectedBtn').addEventListener('click', downloadSelected);
-  document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
-  document.getElementById('cancelSelectBtn').addEventListener('click', toggleSelectMode);
+  if (downloadSelectedBtn) downloadSelectedBtn.addEventListener('click', downloadSelected);
+  if (deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', deleteSelected);
+  if (cancelSelectBtn) cancelSelectBtn.addEventListener('click', toggleSelectMode);
+  if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
 });
 
 function loadImages() {
@@ -135,8 +146,19 @@ function loadImages() {
         deleteImage(img.id);
       });
 
+      // إنشاء زر تكبير الشاشة
+      const fullscreenBtn = document.createElement('button');
+      fullscreenBtn.className = "action-btn";
+      fullscreenBtn.innerHTML = '<i class="ri-fullscreen-line"></i>';
+      fullscreenBtn.title = "تكبير الشاشة";
+      fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFullscreen(img.url, img.id);
+      });
+
       actionsDiv.appendChild(downloadBtn);
       actionsDiv.appendChild(deleteBtn);
+      actionsDiv.appendChild(fullscreenBtn);
 
       // تحسين مربع التحديد
       const checkbox = document.createElement('div');
@@ -378,4 +400,137 @@ function deleteImage(id) {
       }, { once: true });
     }
   });
+}
+
+function toggleFullscreen(url, imgId) {
+  try {
+    const fullscreenContainer = document.createElement('div');
+    fullscreenContainer.className = 'fullscreen-container discord-style';
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'fullscreen-overlay';
+    
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'image-wrapper';
+    
+    const image = document.createElement('img');
+    image.src = url;
+    image.className = 'fullscreen-image';
+    
+    // إضافة شريط الأدوات
+    const actionsBar = document.createElement('div');
+    actionsBar.className = 'fullscreen-actions';
+    
+    // زر الإغلاق
+    const closeButton = document.createElement('button');
+    closeButton.className = 'fullscreen-action-btn';
+    closeButton.innerHTML = '<i class="ri-close-line"></i>';
+    closeButton.title = 'إغلاق';
+    
+    // زر التحميل
+    const downloadButton = document.createElement('button');
+    downloadButton.className = 'fullscreen-action-btn';
+    downloadButton.innerHTML = '<i class="ri-download-2-line"></i>';
+    downloadButton.title = 'تحميل';
+    
+    // زر مشاركة الرابط
+    const shareButton = document.createElement('button');
+    shareButton.className = 'fullscreen-action-btn';
+    shareButton.innerHTML = '<i class="ri-share-line"></i>';
+    shareButton.title = 'مشاركة';
+
+    actionsBar.appendChild(downloadButton);
+    actionsBar.appendChild(shareButton);
+    actionsBar.appendChild(closeButton);
+    
+    imageWrapper.appendChild(image);
+    fullscreenContainer.appendChild(overlay);
+    fullscreenContainer.appendChild(imageWrapper);
+    fullscreenContainer.appendChild(actionsBar);
+    
+    requestAnimationFrame(() => {
+      document.body.appendChild(fullscreenContainer);
+      requestAnimationFrame(() => {
+        fullscreenContainer.classList.add('show');
+      });
+    });
+    
+    const closeFullscreen = () => {
+      fullscreenContainer.classList.add('hiding');
+      setTimeout(() => {
+        if (fullscreenContainer && fullscreenContainer.parentNode) {
+          document.body.removeChild(fullscreenContainer);
+        }
+      }, 300);
+    };
+    
+    // إضافة معالجات الأحداث
+    overlay.addEventListener('click', closeFullscreen);
+    closeButton.addEventListener('click', closeFullscreen);
+    
+    downloadButton.addEventListener('click', () => {
+      downloadImage(url, imgId);
+    });
+    
+    shareButton.addEventListener('click', async () => {
+      // إنشاء قائمة المشاركة
+      const shareMenu = document.createElement('div');
+      shareMenu.className = 'share-menu';
+      
+      // إضافة خيارات المشاركة
+      const shareOptions = shareManager.generateShareLinks(url);
+      const platforms = {
+          copy: { icon: 'ri-file-copy-line', text: 'نسخ الرابط' },
+          twitter: { icon: 'ri-twitter-fill', text: 'Twitter' },
+          facebook: { icon: 'ri-facebook-fill', text: 'Facebook' },
+          whatsapp: { icon: 'ri-whatsapp-fill', text: 'WhatsApp' },
+          telegram: { icon: 'ri-telegram-fill', text: 'Telegram' }
+      };
+  
+      for (const [platform, option] of Object.entries(platforms)) {
+          const button = document.createElement('button');
+          button.className = 'share-option';
+          button.innerHTML = `
+              <i class="${option.icon}"></i>
+              <span>${option.text}</span>
+          `;
+  
+          button.addEventListener('click', async () => {
+              if (platform === 'copy') {
+                  await navigator.clipboard.writeText(url);
+                  showNotification('نجاح', 'تم نسخ الرابط');
+              } else {
+                  window.open(shareOptions[platform], '_blank');
+              }
+              shareMenu.remove();
+          });
+  
+          shareMenu.appendChild(button);
+      }
+  
+      // إضافة القائمة إلى الصفحة
+      shareMenu.style.top = `${shareButton.offsetTop + shareButton.offsetHeight}px`;
+      shareMenu.style.left = `${shareButton.offsetLeft}px`;
+      fullscreenContainer.appendChild(shareMenu);
+  
+      // إغلاق القائمة عند النقر خارجها
+      const closeMenu = (e) => {
+          if (!shareMenu.contains(e.target) && e.target !== shareButton) {
+              shareMenu.remove();
+              document.removeEventListener('click', closeMenu);
+          }
+      };
+      setTimeout(() => document.addEventListener('click', closeMenu), 0);
+  });
+    
+    document.addEventListener('keydown', function handleEsc(e) {
+      if (e.key === 'Escape') {
+        closeFullscreen();
+        document.removeEventListener('keydown', handleEsc);
+      }
+    });
+    
+  } catch (error) {
+    console.error('خطأ في تفعيل وضع ملء الشاشة:', error);
+  }
 }

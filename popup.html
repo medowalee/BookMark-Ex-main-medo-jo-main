@@ -398,15 +398,339 @@
       perspective: 1000px;
       transform-style: preserve-3d;
     }
+
+    /* أنماط وضع ملء الشاشة */
+    :-webkit-full-screen {
+      background-color: #1a1f2c;
+      width: 100vw !important;
+      height: 100vh !important;
+      margin: 0;
+      padding: 20px;
+    }
+
+    :-webkit-full-screen #container {
+      column-count: 4;
+      column-gap: 20px;
+      padding: 20px;
+    }
+
+    :-webkit-full-screen .image-item {
+      margin-bottom: 20px;
+    }
+
+    /* تحسين شكل زر ملء الشاشة على طريقة Discord */
+    .fullscreen-btn {
+      background: rgba(66, 70, 77, 0.36);
+      border: none;
+      color: #b9bbbe;
+      padding: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      margin-left: 8px;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(66, 70, 77, 0.6);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .fullscreen-btn:active {
+      transform: translateY(0);
+    }
+
+    .fullscreen-btn i {
+      font-size: 18px;
+    }
+
+    .fullscreen-btn i {
+      font-size: 18px;
+    }
+
+    /* تعديل شريط العنوان */
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* أنماط عارض الصور */
+    .image-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .viewer-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(5px);
+    }
+
+    .viewer-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90vh;
+      z-index: 1;
+    }
+
+    .viewer-content img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .close-viewer {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      transition: transform 0.2s;
+    }
+
+    .close-viewer:hover {
+      transform: scale(1.1);
+    }
+
+    .image-viewer.closing {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+
+    /* أضف هذه الأنماط إلى ملف CSS الخاص بك */
+.fullscreen-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.fullscreen-image {
+  max-width: 90%;
+  max-height: 90vh;
+  z-index: 10000;
+  object-fit: contain;
+}
+
+.fullscreen-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 10001;
+}
+
+/* أنماط العرض بملء الشاشة بطريقة Discord */
+  .fullscreen-container.discord-style {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .fullscreen-container.discord-style.show {
+    opacity: 1;
+  }
+
+  .fullscreen-container.discord-style.hiding {
+    opacity: 0;
+  }
+
+  .fullscreen-container.discord-style .fullscreen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+  }
+
+  .fullscreen-container.discord-style .image-wrapper {
+    position: relative;
+    z-index: 10000;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fullscreen-container.discord-style.show .image-wrapper {
+    transform: scale(1);
+  }
+
+  .fullscreen-container.discord-style .fullscreen-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .fullscreen-container.discord-style .fullscreen-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10001;
+  }
+
+  .fullscreen-container.discord-style .fullscreen-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+
+  .fullscreen-container.discord-style .fullscreen-close:active {
+    transform: scale(0.95);
+  }
+
+  /* أنماط شريط الأدوات في وضع ملء الشاشة */
+  .fullscreen-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    z-index: 10001;
+  }
+
+  .fullscreen-action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .fullscreen-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+
+  .fullscreen-action-btn:active {
+    transform: scale(0.95);
+  }
+
+  .fullscreen-action-btn i {
+    font-size: 20px;
+  }
+
+  /* تحديث نمط الحاوية لدعم الأزرار الجديدة */
+  .fullscreen-container.discord-style .image-wrapper {
+    margin-top: 60px;
+  }
+
+  /* أنماط قائمة المشاركة */
+  .share-menu {
+    position: absolute;
+    background: #2f3136;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10002;
+    animation: scaleIn 0.2s ease-out;
+    min-width: 200px;
+  }
+
+  .share-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .share-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .share-option i {
+    font-size: 20px;
+  }
+
+  .share-option span {
+    font-size: 14px;
+  }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="header-content">
       <h2>الصور المحفوظة</h2>
-      <button id="headerSelectBtn" class="header-btn-t">
-        تحديد
-      </button>
+      <div class="header-actions">
+        <button id="headerSelectBtn" class="header-btn-t">
+          تحديد
+        </button>
+      </div>
     </div>
     <div id="toolbar" class="toolbar">
       <div class="toolbar-group">
@@ -429,6 +753,9 @@
   </div>
   <div id="container"></div>
   <script src="js/loading.js"></script>
+  <script src="js/screen.js"></script>
+  <script src="js/fullscreen-handler.js"></script>
+  <script src="js/share.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
