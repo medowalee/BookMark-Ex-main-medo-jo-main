@@ -6,7 +6,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <script src="js/browser-detector.js"></script>
-  <style>
+  <link rel="stylesheet" href="./style/index.css">
+  <!-- <style>
     body {
       background-color: #1a1f2c;
       color: #ffffff;
@@ -720,13 +721,142 @@
   .share-option span {
     font-size: 14px;
   }
-  </style>
+
+  /* أنماط قائمة مشاركة الصور المحددة */
+  .share-menu {
+    background: #2f3136;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10002;
+    min-width: 200px;
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  .share-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+  }
+
+  .share-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-2px);
+  }
+
+  .share-option i {
+    font-size: 20px;
+  }
+
+  .share-option span {
+    font-size: 14px;
+  }
+
+  /* أنماط قسم المجموعات */
+  .groups-section {
+    background: #242d3d;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .groups-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .groups-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .group-item {
+    background: rgba(255, 255, 255, 0.05);
+    width: 80px;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .group-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .group-item.drag-over {
+    background: rgba(66, 153, 225, 0.2);
+    border-style: dashed;
+  }
+
+  .group-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .group-count {
+    font-size: 12px;
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .group-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .group-item:hover .group-actions {
+    opacity: 1;
+  }
+
+  .group-btn {
+    padding: 4px;
+    border-radius: 4px;
+    border: none;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .group-btn:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  </style> -->
 </head>
 <body>
   <div class="header">
     <div class="header-content">
       <h2>الصور المحفوظة</h2>
       <div class="header-actions">
+        <button id="createGroupBtn" class="header-btn-t">
+          <i class="ri-folder-add-line"></i>
+        </button>
         <button id="headerSelectBtn" class="header-btn-t">
           تحديد
         </button>
@@ -751,11 +881,14 @@
       </div>
     </div>
   </div>
+  <div id="groups-section-container"></div>
   <div id="container"></div>
   <script src="js/loading.js"></script>
   <!-- <script src="js/screen.js"></script> -->
   <script src="js/fullscreen-handler.js"></script>
   <script src="js/share.js"></script>
+  <script src="plogin/groups.js"></script>
+  <script src="plogin/group-ui.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

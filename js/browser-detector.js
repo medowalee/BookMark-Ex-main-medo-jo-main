@@ -1,27 +1,34 @@
 function loadBrowserSpecificCSS() {
-    const userAgent = navigator.userAgent.toLowerCase();
     let cssFile = 'chrome.css'; // القيمة الافتراضية
-    
-    // التحقق من Arc أولاً لأنه قد يحتوي على سلاسل Chrome
-    if (userAgent.includes('arc/') || 
-        (window.chrome && navigator.vendor === 'Arc') || 
-        document.documentElement.style.hasOwnProperty('--arc-palette-background')) {
+
+    // تحسين الكشف عن متصفح Arc
+    const isArc = () => {
+        // طرق متعددة للكشف عن Arc
+        return window.navigator.userAgent.includes('Arc') ||
+               window.chrome?.arc !== undefined ||
+               document.documentElement.style.hasOwnProperty('--arc-palette-foregroundPrimary') ||
+               // إضافة خاصية CSS خاصة بـ Arc
+               getComputedStyle(document.documentElement)
+                   .getPropertyValue('--arc-palette-maxWidth') !== '';
+    };
+
+    if (isArc()) {
         cssFile = 'arc.css';
-    } else if (userAgent.includes('edg/')) {
+    } else if (navigator.userAgent.toLowerCase().includes('edg/')) {
         cssFile = 'Microsoft_Edge.css';
-    } else if (userAgent.includes('brave')) {
+    } else if (navigator.userAgent.toLowerCase().includes('brave')) {
         cssFile = 'brave.css';
     }
-    
-    console.log('Detected browser CSS:', cssFile); // للتأكد من عمل الكشف بشكل صحيح
+
     
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = `css/${cssFile}`;
     document.head.appendChild(link);
+    // console.log('Detected browser CSS:', link);
 }
 
-// انتظار تحميل DOM ثم تنفيذ الكشف
+// تنفيذ الكشف بعد تحميل DOM
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadBrowserSpecificCSS);
 } else {

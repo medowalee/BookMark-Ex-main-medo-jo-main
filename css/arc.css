@@ -2,4 +2,6 @@ body {
     width: 580px;
     min-width: 580px;
     max-width: 580px;
+    height: 400px;
+    min-height: 400px;
 }

@@ -8,16 +8,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadImages();
+  // تعديل: إزالة initializeGroups لأننا نقوم بإدارة زر المجموعات مباشرة
 
   // التحقق من وجود الأزرار قبل إضافة مستمعات الأحداث
+  const createGroupBtn = document.getElementById('createGroupBtn');
   const headerSelectBtn = document.getElementById('headerSelectBtn');
   const selectAllBtn = document.getElementById('selectAllBtn');
   const downloadSelectedBtn = document.getElementById('downloadSelectedBtn');
   const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
   const cancelSelectBtn = document.getElementById('cancelSelectBtn');
   const fullscreenBtn = document.getElementById('fullscreenBtn');
+  // إضافة زر المشاركة
+  const shareSelectedBtn = document.createElement('button');
+  shareSelectedBtn.className = 'toolbar-btn';
+  shareSelectedBtn.innerHTML = '<i class="ri-share-line"></i> مشاركة المحدد';
+  
+  // إضافة الزر إلى مجموعة الأزرار
+  document.querySelector('.toolbar-group:last-child').insertBefore(
+    shareSelectedBtn,
+    deleteSelectedBtn
+  );
+
+  // إضافة مستمع الحدث للزر الجديد
+  shareSelectedBtn.addEventListener('click', shareSelected);
+
+  if (createGroupBtn) {
+    createGroupBtn.addEventListener('click', () => {
+      groupUI.showCreateGroupDialog();
+    });
+  }
 
   if (headerSelectBtn) headerSelectBtn.addEventListener('click', toggleSelectMode);
   if (selectAllBtn) {
@@ -43,15 +64,23 @@ document.addEventListener('DOMContentLoaded', () => {
   if (deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', deleteSelected);
   if (cancelSelectBtn) cancelSelectBtn.addEventListener('click', toggleSelectMode);
   if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+  // تهيئة حالة الصور في المجموعات
+  await groupManager.initializeImageStates();
+  await groupManager.showAllImages();
 });
 
 function loadImages() {
-  chrome.storage.local.get({ images: [] }, (data) => {
+  chrome.storage.local.get({ images: [] }, async (data) => {
     const images = data.images;
     const container = document.getElementById('container');
     container.innerHTML = "";
 
-    if (images.length === 0) {
+    // إضافة قائمة المجموعات في بداية تحميل الصور
+    const groups = await groupManager.getAllGroups();
+    const groupsList = groupUI.renderGroups(groups);
+
+    if (images.length === 0 && groups.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
           <h3 style="text-align: center; color: #666;">لا توجد صور محفوظة</h3>
@@ -80,6 +109,16 @@ function loadImages() {
       item.addEventListener('dragend', handleDragEnd);
       item.addEventListener('dragover', handleDragOver);
       item.addEventListener('drop', handleDrop);
+
+      // Add this to the image item creation:
+      item.addEventListener('dragstart', (e) => {
+        groupUI.draggedImage = item;
+        e.dataTransfer.setData('text/plain', 'image');
+      });
+
+      item.addEventListener('dragend', () => {
+        groupUI.draggedImage = null;
+      });
 
       // إضافة معالج الضغطة المطولة للموبايل
       item.addEventListener('touchstart', handleTouchStart);
@@ -557,4 +596,75 @@ async function toggleFullscreen(url, imgId) {
   } catch (error) {
     console.error('خطأ في تفعيل وضع ملء الشاشة:', error);
   }
+}
+
+// إضافة دالة مشاركة الصور المحددة
+async function shareSelected() {
+  if (selectedImages.size === 0) return;
+
+  const shareMenu = document.createElement('div');
+  shareMenu.className = 'share-menu';
+  shareMenu.style.position = 'fixed';
+  shareMenu.style.top = '50%';
+  shareMenu.style.left = '50%';
+  shareMenu.style.transform = 'translate(-50%, -50%)';
+
+  const shareOptions = [
+    { id: 'copyLinks', icon: 'ri-file-copy-line', text: 'نسخ الروابط' },
+    { id: 'shareWhatsApp', icon: 'ri-whatsapp-fill', text: 'WhatsApp' },
+    { id: 'shareTelegram', icon: 'ri-telegram-fill', text: 'Telegram' },
+    { id: 'shareTwitter', icon: 'ri-twitter-fill', text: 'Twitter' }
+  ];
+
+  chrome.storage.local.get({ images: [] }, async (data) => {
+    const selectedUrls = data.images
+      .filter(img => selectedImages.has(img.id))
+      .map(img => img.url);
+
+    shareOptions.forEach(option => {
+      const button = document.createElement('button');
+      button.className = 'share-option';
+      button.innerHTML = `
+        <i class="${option.icon}"></i>
+        <span>${option.text}</span>
+      `;
+
+      button.addEventListener('click', async () => {
+        switch (option.id) {
+          case 'copyLinks':
+            const links = selectedUrls.join('\n');
+            await navigator.clipboard.writeText(links);
+            showNotification('نجاح', 'تم نسخ الروابط');
+            break;
+          case 'shareWhatsApp':
+            const whatsappText = selectedUrls.join('\n\n');
+            window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+            break;
+          case 'shareTelegram':
+            const telegramText = selectedUrls.join('\n\n');
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(telegramText)}`, '_blank');
+            break;
+          case 'shareTwitter':
+            const twitterText = selectedUrls.join('\n\n');
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`, '_blank');
+            break;
+        }
+        shareMenu.remove();
+      });
+
+      shareMenu.appendChild(button);
+    });
+
+    document.body.appendChild(shareMenu);
+
+    // إغلاق القائمة عند النقر خارجها
+    const closeMenu = (e) => {
+      if (!shareMenu.contains(e.target)) {
+        shareMenu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    };
+    
+    setTimeout(() => document.addEventListener('click', closeMenu), 0);
+  });
 }
